@@ -1,0 +1,1069 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0f1e;--bg2:#111827;--bg3:#1a2236;--bg4:#222d44;
+    --border:#2a3650;--border2:#3a4a6a;
+    --text:#e8edf8;--text2:#8a9ab8;--text3:#4a5a78;
+    --blue1:#0d47a1;--blue2:#1565c0;--blue3:#1976d2;--blue4:#42a5f5;--blue5:#90caf9;--blue6:#bbdefb;
+    --accent:#3d8ef8;--accentg:#2563eb;
+    --green:#4caf50;--amber:#ffa726;--red:#ef5350;--purple:#ab47bc;
+    --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+    --r:10px;--r2:14px;--r3:18px;
+    --sidebar:220px;
+  }
+  body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+  #app{display:flex;min-height:100vh}
+
+  /* SIDEBAR */
+  #sidebar{
+    width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;padding:1.5rem 0;position:fixed;top:0;left:0;height:100vh;z-index:100;
+  }
+  .logo{padding:0 1.25rem 1.5rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--border);margin-bottom:1rem}
+  .logo-icon{width:34px;height:34px;background:linear-gradient(135deg,var(--blue3),var(--accent));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:600;color:#fff}
+  .logo-text{font-size:16px;font-weight:600;letter-spacing:-0.3px}
+  .logo-sub{font-size:11px;color:var(--text2);letter-spacing:0.5px;margin-top:1px}
+  nav{flex:1;padding:0 0.75rem;display:flex;flex-direction:column;gap:2px}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r);cursor:pointer;font-size:13.5px;font-weight:500;color:var(--text2);transition:all 0.15s;border:none;background:none;width:100%;text-align:left}
+  .nav-item:hover{background:var(--bg3);color:var(--text)}
+  .nav-item.active{background:rgba(61,142,248,0.15);color:var(--accent)}
+  .nav-item i{font-size:17px;width:20px;text-align:center}
+  .nav-section{font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text3);padding:12px 12px 4px;text-transform:uppercase}
+  .sidebar-bottom{padding:0.75rem}
+  .theme-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:9px;border-radius:var(--r);background:var(--bg3);border:1px solid var(--border);cursor:pointer;font-size:13px;color:var(--text2);font-family:var(--font);transition:all 0.15s}
+  .theme-btn:hover{border-color:var(--border2);color:var(--text)}
+
+  /* MAIN */
+  #main{margin-left:var(--sidebar);flex:1;padding:1.75rem;min-height:100vh;overflow-y:auto}
+  .page{display:none}.page.active{display:block}
+
+  /* TOPBAR */
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem}
+  .page-title{font-size:22px;font-weight:600;letter-spacing:-0.5px}
+  .page-sub{font-size:13px;color:var(--text2);margin-top:2px}
+  .topbar-right{display:flex;align-items:center;gap:10px}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:var(--r);cursor:pointer;font-size:13px;font-family:var(--font);font-weight:500;border:none;transition:all 0.15s}
+  .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accentg)}
+  .btn-ghost{background:var(--bg3);color:var(--text2);border:1px solid var(--border)}.btn-ghost:hover{color:var(--text);border-color:var(--border2)}
+  .btn-sm{padding:6px 12px;font-size:12px}
+
+  /* CARDS */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:1.25rem}
+  .card-sm{padding:1rem}
+  .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+  .stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:1rem}
+  .stat-val{font-size:26px;font-weight:600;letter-spacing:-1px;margin-bottom:2px}
+  .stat-label{font-size:12px;color:var(--text2);font-weight:500}
+  .stat-change{font-size:11px;margin-top:4px}
+  .blue{color:var(--accent)}.green{color:var(--green)}.amber{color:var(--amber)}.red{color:var(--red)}.purple{color:var(--purple)}
+
+  /* DASHBOARD GRID */
+  .dash-grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+  .dash-col{display:flex;flex-direction:column;gap:16px}
+  .section-title{font-size:13px;font-weight:600;color:var(--text2);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:12px}
+
+  /* HEATMAP */
+  .heatmap-wrap{overflow-x:auto;padding-bottom:4px}
+  .heatmap-row{display:flex;gap:3px;align-items:center}
+  .heatmap-day-labels{display:flex;flex-direction:column;gap:3px;margin-right:6px}
+  .hm-label{font-size:10px;color:var(--text3);line-height:1;height:12px;display:flex;align-items:center;font-family:var(--mono)}
+  .heatmap-grid{display:flex;gap:3px}
+  .hm-week{display:flex;flex-direction:column;gap:3px}
+  .hm-cell{width:12px;height:12px;border-radius:2px;cursor:pointer;transition:transform 0.1s}
+  .hm-cell:hover{transform:scale(1.3)}
+  .hm-0{background:#1a2236}.hm-1{background:#0d47a1}.hm-2{background:#1976d2}.hm-3{background:#42a5f5}.hm-4{background:#90caf9}
+  .hm-month-labels{display:flex;gap:3px;margin-left:34px;margin-bottom:4px}
+  .hm-mlabel{font-size:10px;color:var(--text3);font-family:var(--mono)}
+  .hm-legend{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:11px;color:var(--text3)}
+  .hm-legend-cells{display:flex;gap:3px}
+
+  /* TODAY SCHEDULE */
+  .schedule-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)}
+  .schedule-item:last-child{border-bottom:none}
+  .schedule-time{font-size:11px;color:var(--text2);font-family:var(--mono);min-width:80px;padding-top:2px}
+  .schedule-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:500}
+  .schedule-type{font-size:11px;color:var(--text2);margin-top:2px}
+
+  /* PROGRESS RING */
+  .courses-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .course-mini{display:flex;align-items:center;gap:10px;background:var(--bg3);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:all 0.15s;border:1px solid transparent}
+  .course-mini:hover{border-color:var(--border2)}
+  .ring-wrap{position:relative;width:40px;height:40px;flex-shrink:0}
+  .ring-wrap svg{transform:rotate(-90deg)}
+  .ring-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:10px;font-weight:600;font-family:var(--mono)}
+  .course-mini-name{font-size:13px;font-weight:500;line-height:1.3}
+  .course-mini-sub{font-size:11px;color:var(--text2);margin-top:2px}
+
+  /* UPCOMING */
+  .event-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+  .event-item:last-child{border-bottom:none}
+  .event-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .event-name{font-size:13px;font-weight:500}
+  .event-date{font-size:11px;color:var(--text2);margin-top:1px}
+  .event-badge{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:auto;white-space:nowrap}
+
+  /* TIMETABLE */
+  .tt-grid{display:grid;grid-template-columns:60px repeat(7,1fr);gap:1px;background:var(--border);border-radius:var(--r2);overflow:hidden}
+  .tt-cell{background:var(--bg2);padding:8px;min-height:48px;position:relative}
+  .tt-header{background:var(--bg3);font-size:12px;font-weight:600;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px}
+  .tt-day-num{font-size:18px;font-weight:600;color:var(--text);font-family:var(--mono)}
+  .tt-time{font-size:10px;color:var(--text3);font-family:var(--mono);display:flex;align-items:center;justify-content:center;padding:4px}
+  .tt-slot{border-radius:6px;padding:5px 7px;font-size:11px;font-weight:500;cursor:pointer;transition:all 0.15s;position:relative}
+  .tt-slot:hover{filter:brightness(1.15)}
+  .tt-slot-name{font-size:11px;font-weight:600;line-height:1.2}
+  .tt-slot-type{font-size:10px;opacity:0.75;margin-top:1px}
+  .tt-add{display:flex;align-items:center;justify-content:center;height:100%;min-height:32px;color:var(--text3);cursor:pointer;border-radius:6px;transition:all 0.15s;border:1px dashed transparent}
+  .tt-add:hover{border-color:var(--border2);color:var(--text2)}
+
+  /* COURSES */
+  .courses-list{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .course-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:1.25rem;cursor:pointer;transition:all 0.2s}
+  .course-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+  .course-dot{width:36px;height:36px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+  .course-name{font-size:15px;font-weight:600;margin-bottom:4px}
+  .course-desc{font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.5}
+  .prog-bar-wrap{height:5px;background:var(--bg4);border-radius:3px;overflow:hidden;margin-bottom:6px}
+  .prog-bar{height:100%;border-radius:3px;transition:width 0.5s}
+  .prog-label{font-size:11px;color:var(--text2);display:flex;justify-content:space-between}
+  .add-course-card{background:transparent;border:1px dashed var(--border2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text3);font-size:13px;cursor:pointer;min-height:160px;transition:all 0.15s}
+  .add-course-card:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* COURSE DETAIL */
+  #course-detail{display:none}
+  #course-detail.active{display:block}
+  .view-toggle{display:flex;gap:2px;background:var(--bg3);padding:3px;border-radius:var(--r);border:1px solid var(--border)}
+  .view-btn{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);font-family:var(--font);transition:all 0.15s}
+  .view-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+
+  /* KANBAN */
+  .kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .kanban-col{background:var(--bg3);border-radius:var(--r2);padding:12px;border:1px solid var(--border)}
+  .kanban-col-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .kanban-col-title{font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--text2)}
+  .kanban-count{font-size:11px;font-family:var(--mono);background:var(--bg4);padding:1px 7px;border-radius:10px;color:var(--text2)}
+  .kanban-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 12px;margin-bottom:8px;cursor:pointer;transition:all 0.15s}
+  .kanban-card:hover{border-color:var(--border2)}
+  .kanban-card:last-child{margin-bottom:0}
+  .kc-title{font-size:13px;font-weight:500;line-height:1.4}
+  .kc-sub{font-size:11px;color:var(--text2);margin-top:3px}
+  .kc-tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:10px;margin-top:6px;font-weight:500}
+
+  /* CHECKLIST */
+  .checklist{display:flex;flex-direction:column;gap:6px}
+  .check-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border);cursor:pointer;transition:all 0.15s}
+  .check-item:hover{border-color:var(--border2)}
+  .check-item.done{opacity:0.55}
+  .check-box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+  .check-item.done .check-box{background:var(--green);border-color:var(--green)}
+  .check-label{font-size:13px;font-weight:500;flex:1}
+  .check-item.done .check-label{text-decoration:line-through;color:var(--text2)}
+  .check-status{font-size:11px;color:var(--text2)}
+
+  /* CALENDAR */
+  .cal-nav{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+  .cal-month{font-size:20px;font-weight:600;letter-spacing:-0.5px}
+  .cal-toggle{display:flex;gap:2px;background:var(--bg3);padding:3px;border-radius:var(--r);border:1px solid var(--border);margin-left:auto}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border-radius:var(--r2);overflow:hidden}
+  .cal-dh{background:var(--bg3);text-align:center;font-size:11px;font-weight:600;color:var(--text2);padding:10px;text-transform:uppercase;letter-spacing:0.5px}
+  .cal-day{background:var(--bg2);min-height:80px;padding:6px;cursor:pointer;position:relative;transition:background 0.15s}
+  .cal-day:hover{background:var(--bg3)}
+  .cal-day.other-month .cal-num{color:var(--text3)}
+  .cal-day.today{background:rgba(61,142,248,0.08)}
+  .cal-day.today .cal-num{color:var(--accent);font-weight:700}
+  .cal-num{font-size:13px;font-weight:500;margin-bottom:4px;display:block}
+  .cal-ev{font-size:10px;padding:1px 5px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+
+  /* WEEK VIEW */
+  .week-grid{display:grid;grid-template-columns:50px repeat(7,1fr);gap:1px;background:var(--border);border-radius:var(--r2);overflow:hidden}
+  .week-header{background:var(--bg3);text-align:center;padding:10px 4px}
+  .week-day{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px}
+  .week-date{font-size:20px;font-weight:600;font-family:var(--mono)}
+  .week-time-cell{background:var(--bg2);font-size:10px;color:var(--text3);font-family:var(--mono);padding:4px;min-height:52px;display:flex;align-items:flex-start;justify-content:center;padding-top:6px}
+  .week-cell{background:var(--bg2);padding:3px;min-height:52px;position:relative}
+  .week-event{border-radius:5px;padding:3px 5px;font-size:10px;font-weight:500;margin-bottom:2px}
+
+  /* MODAL */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:flex;align-items:center;justify-content:center;display:none}
+  .modal-backdrop.open{display:flex}
+  .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r3);padding:1.75rem;width:440px;max-width:95vw;max-height:85vh;overflow-y:auto}
+  .modal-title{font-size:17px;font-weight:600;margin-bottom:1.25rem}
+  .form-group{margin-bottom:14px}
+  .form-label{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;display:block}
+  .form-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;transition:border-color 0.15s}
+  .form-input:focus{border-color:var(--accent)}
+  .form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:9px 12px;font-size:13px;color:var(--text);font-family:var(--font);outline:none;cursor:pointer}
+  .form-select:focus{border-color:var(--accent)}
+  .color-picker{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+  .color-swatch{width:26px;height:26px;border-radius:6px;cursor:pointer;transition:transform 0.15s;border:2px solid transparent}
+  .color-swatch:hover{transform:scale(1.15)}
+  .color-swatch.selected{border-color:#fff}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border)}
+
+  /* STREAK */
+  .streak-wrap{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg3);border-radius:var(--r);border:1px solid var(--border)}
+  .streak-num{font-size:28px;font-weight:700;color:var(--accent);font-family:var(--mono);letter-spacing:-1px}
+  .streak-label{font-size:12px;color:var(--text2);line-height:1.4}
+
+  /* LIGHT THEME */
+  body.light{
+    --bg:#f5f7fb;--bg2:#ffffff;--bg3:#f0f2f8;--bg4:#e4e8f2;
+    --border:#dde1ed;--border2:#bfc6dc;
+    --text:#1a2035;--text2:#5a6585;--text3:#9aa3be;
+  }
+  body.light .hm-0{background:#e8edf8}
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="logo">
+      <div class="logo-icon">S</div>
+      <div>
+        <div class="logo-text">StudyOS</div>
+        <div class="logo-sub">Study Planner</div>
+      </div>
+    </div>
+    <nav>
+      <span class="nav-section">Overview</span>
+      <button class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <i class="ti ti-layout-dashboard"></i> Dashboard
+      </button>
+      <span class="nav-section">Plan</span>
+      <button class="nav-item" data-page="timetable" onclick="navigate('timetable')">
+        <i class="ti ti-table"></i> Timetable
+      </button>
+      <button class="nav-item" data-page="courses" onclick="navigate('courses')">
+        <i class="ti ti-books"></i> Courses
+      </button>
+      <button class="nav-item" data-page="calendar" onclick="navigate('calendar')">
+        <i class="ti ti-calendar"></i> Calendar
+      </button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="theme-btn" onclick="toggleTheme()">
+        <i class="ti ti-sun" id="theme-icon"></i>
+        <span id="theme-label">Light Mode</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="topbar">
+        <div>
+          <div class="page-title" id="dash-greeting">Good morning 👋</div>
+          <div class="page-sub" id="dash-date"></div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-ghost btn-sm" onclick="logStudyDay()"><i class="ti ti-flame"></i> Log Study Session</button>
+        </div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Study Streak</div>
+          <div class="stat-val blue" id="stat-streak">0</div>
+          <div class="stat-change" style="color:var(--text2)">days in a row 🔥</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Courses Active</div>
+          <div class="stat-val" id="stat-courses">0</div>
+          <div class="stat-change" style="color:var(--text2)">enrolled courses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Topics Done</div>
+          <div class="stat-val green" id="stat-done">0</div>
+          <div class="stat-change" style="color:var(--text2)">completed topics</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Upcoming Events</div>
+          <div class="stat-val amber" id="stat-events">0</div>
+          <div class="stat-change" style="color:var(--text2)">in next 7 days</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="dash-col">
+          <!-- HEATMAP -->
+          <div class="card">
+            <div class="section-title">Study Activity — Past Year</div>
+            <div id="heatmap-container"></div>
+            <div class="hm-legend">
+              Less
+              <div class="hm-legend-cells">
+                <div class="hm-cell hm-0"></div>
+                <div class="hm-cell hm-1"></div>
+                <div class="hm-cell hm-2"></div>
+                <div class="hm-cell hm-3"></div>
+                <div class="hm-cell hm-4"></div>
+              </div>
+              More
+            </div>
+          </div>
+          <!-- TODAY -->
+          <div class="card">
+            <div class="section-title">Today's Schedule</div>
+            <div id="today-schedule"><div style="color:var(--text3);font-size:13px;padding:1rem 0">No classes today. Add slots in the Timetable.</div></div>
+          </div>
+        </div>
+
+        <div class="dash-col">
+          <!-- STREAK -->
+          <div class="streak-wrap">
+            <div class="streak-num" id="streak-big">0</div>
+            <div>
+              <div class="streak-label" style="font-weight:600;color:var(--text)">Day Streak</div>
+              <div class="streak-label">Keep studying every day!</div>
+            </div>
+            <i class="ti ti-flame" style="margin-left:auto;font-size:28px;color:var(--amber)" aria-hidden="true"></i>
+          </div>
+          <!-- COURSE PROGRESS -->
+          <div class="card card-sm">
+            <div class="section-title">Course Progress</div>
+            <div class="courses-grid" id="dash-courses"></div>
+          </div>
+          <!-- UPCOMING EVENTS -->
+          <div class="card card-sm">
+            <div class="section-title">Upcoming Events</div>
+            <div id="dash-events"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMETABLE -->
+    <div id="page-timetable" class="page">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Timetable</div>
+          <div class="page-sub">Weekly class schedule</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary btn-sm" onclick="openAddSlot()"><i class="ti ti-plus"></i> Add Slot</button>
+        </div>
+      </div>
+      <div id="tt-container"></div>
+    </div>
+
+    <!-- COURSES -->
+    <div id="page-courses" class="page">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Courses</div>
+          <div class="page-sub">Track your study progress</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary btn-sm" onclick="openAddCourse()"><i class="ti ti-plus"></i> Add Course</button>
+        </div>
+      </div>
+      <div id="page-courses-list">
+        <div class="courses-list" id="courses-grid"></div>
+      </div>
+      <div id="course-detail">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.5rem">
+          <button class="btn btn-ghost btn-sm" onclick="closeCourseDetail()"><i class="ti ti-arrow-left"></i> Back</button>
+          <div style="flex:1">
+            <div class="page-title" id="cd-title"></div>
+            <div class="page-sub" id="cd-sub"></div>
+          </div>
+          <div class="view-toggle">
+            <button class="view-btn active" id="vb-kanban" onclick="setTopicView('kanban')">Kanban</button>
+            <button class="view-btn" id="vb-checklist" onclick="setTopicView('checklist')">Checklist</button>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="openAddTopic()"><i class="ti ti-plus"></i> Add Topic</button>
+        </div>
+        <div id="topic-kanban"></div>
+        <div id="topic-checklist" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- CALENDAR -->
+    <div id="page-calendar" class="page">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Calendar</div>
+          <div class="page-sub">Events & deadlines</div>
+        </div>
+        <div class="topbar-right">
+          <button class="btn btn-primary btn-sm" onclick="openAddEvent()"><i class="ti ti-plus"></i> Add Event</button>
+        </div>
+      </div>
+      <div class="cal-nav">
+        <button class="btn btn-ghost btn-sm" onclick="calNav(-1)"><i class="ti ti-chevron-left"></i></button>
+        <div class="cal-month" id="cal-month-label"></div>
+        <button class="btn btn-ghost btn-sm" onclick="calNav(1)"><i class="ti ti-chevron-right"></i></button>
+        <div class="cal-toggle" style="margin-left:auto">
+          <button class="view-btn active" id="cvb-month" onclick="setCalView('month')">Month</button>
+          <button class="view-btn" id="cvb-week" onclick="setCalView('week')">Week</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="calToday()">Today</button>
+      </div>
+      <div id="cal-container"></div>
+    </div>
+
+  </div><!-- /main -->
+</div>
+
+<!-- MODALS -->
+<div class="modal-backdrop" id="modal-slot">
+  <div class="modal">
+    <div class="modal-title">Add Timetable Slot</div>
+    <div class="form-group">
+      <label class="form-label">Course</label>
+      <select class="form-select" id="slot-course"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Day</label>
+      <select class="form-select" id="slot-day">
+        <option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option>
+        <option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Time</label>
+      <input class="form-input" type="time" id="slot-time" value="09:00">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <select class="form-select" id="slot-type">
+        <option>Lecture</option><option>Lab</option><option>Tutorial</option><option>Self-Study</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-slot')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSlot()">Add Slot</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-course">
+  <div class="modal">
+    <div class="modal-title">Add Course</div>
+    <div class="form-group">
+      <label class="form-label">Course Name</label>
+      <input class="form-input" id="course-name-input" placeholder="e.g. Data Structures">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <input class="form-input" id="course-desc-input" placeholder="Short description">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Target Date</label>
+      <input class="form-input" type="date" id="course-date-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Color</label>
+      <div class="color-picker" id="course-color-picker"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-course')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCourse()">Add Course</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-topic">
+  <div class="modal">
+    <div class="modal-title">Add Topic</div>
+    <div class="form-group">
+      <label class="form-label">Topic Name</label>
+      <input class="form-input" id="topic-name-input" placeholder="e.g. Binary Trees">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes</label>
+      <input class="form-input" id="topic-notes-input" placeholder="Chapter, pages, etc.">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="topic-status-input">
+        <option value="todo">Not Started</option>
+        <option value="inprogress">In Progress</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-topic')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTopic()">Add Topic</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-event">
+  <div class="modal">
+    <div class="modal-title">Add Calendar Event</div>
+    <div class="form-group">
+      <label class="form-label">Event Name</label>
+      <input class="form-input" id="event-name-input" placeholder="e.g. Final Exam">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Date</label>
+      <input class="form-input" type="date" id="event-date-input">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Type</label>
+      <select class="form-select" id="event-type-input">
+        <option value="exam">Exam</option>
+        <option value="deadline">Deadline</option>
+        <option value="holiday">Holiday</option>
+        <option value="reminder">Reminder</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Link to Course (optional)</label>
+      <select class="form-select" id="event-course-input"><option value="">None</option></select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-event')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEvent()">Add Event</button>
+    </div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css">
+
+<script>
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const HOURS=['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00','19:00'];
+const COLORS=['#3d8ef8','#ab47bc','#4caf50','#ffa726','#ef5350','#26c6da','#ff7043','#66bb6a'];
+const EV_COLORS={exam:'#ef5350',deadline:'#ffa726',holiday:'#4caf50',reminder:'#3d8ef8'};
+const EV_BG={exam:'rgba(239,83,80,0.15)',deadline:'rgba(255,167,38,0.15)',holiday:'rgba(76,175,80,0.15)',reminder:'rgba(61,142,248,0.15)'};
+
+let state={
+  courses:[],timetable:[],events:[],activity:{},settings:{theme:'dark'},
+  calView:'month',calYear:2026,calMonth:4,
+  activeCourse:null,topicView:'kanban'
+};
+let selectedColor=COLORS[0];
+const STORAGE_KEY = 'studyos-state';
+
+async function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){const s=JSON.parse(raw);state={...state,...s};}
+  }catch(e){}
+}
+async function saveState(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify({
+    courses:state.courses,timetable:state.timetable,events:state.events,
+    activity:state.activity,settings:state.settings
+  }));}catch(e){}
+}
+
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelector(`[data-page="${page}"]`).classList.add('active');
+  if(page==='dashboard')renderDashboard();
+  if(page==='timetable')renderTimetable();
+  if(page==='courses'){showCoursesList();renderCourses();}
+  if(page==='calendar')renderCalendar();
+}
+
+function toggleTheme(){
+  const isLight=document.body.classList.toggle('light');
+  state.settings.theme=isLight?'light':'dark';
+  document.getElementById('theme-icon').className=isLight?'ti ti-moon':'ti ti-sun';
+  document.getElementById('theme-label').textContent=isLight?'Dark Mode':'Light Mode';
+  saveState();
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ── HEATMAP ──────────────────────────────────────────────
+function renderHeatmap(){
+  const cont=document.getElementById('heatmap-container');
+  const today=new Date();
+  const end=new Date(today);
+  const start=new Date(today);start.setFullYear(start.getFullYear()-1);
+  // align to Monday
+  while(start.getDay()!==1)start.setDate(start.getDate()-1);
+  const weeks=[];let week=[];
+  const cur=new Date(start);
+  const months={};
+  let wi=0;
+  while(cur<=end){
+    const key=cur.toISOString().split('T')[0];
+    const mon=cur.getMonth();
+    if(!months[wi])months[wi]=mon;
+    week.push({date:key,count:state.activity[key]||0,d:new Date(cur)});
+    if(cur.getDay()===0){weeks.push(week);week=[];wi++;}
+    cur.setDate(cur.getDate()+1);
+  }
+  if(week.length)weeks.push(week);
+
+  // Month labels
+  const mnames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  let mlHtml='<div style="display:flex;gap:3px;margin-left:34px;margin-bottom:4px;">';
+  let lastMon=-1;
+  weeks.forEach((w,i)=>{
+    if(w[0]){const m=w[0].d.getMonth();if(m!==lastMon){mlHtml+=`<span style="font-size:10px;color:var(--text3);font-family:var(--mono);min-width:${12*4+3*4}px">${mnames[m]}</span>`;lastMon=m;}else{mlHtml+=`<span style="min-width:${12}px;display:inline-block"></span>`;}}
+  });
+  mlHtml+='</div>';
+
+  let html=mlHtml+'<div style="display:flex;gap:3px;">';
+  html+='<div style="display:flex;flex-direction:column;gap:3px;margin-right:6px;">';
+  ['Mon','','Wed','','Fri','','Sun'].forEach(d=>{
+    html+=`<div style="font-size:10px;color:var(--text3);height:12px;line-height:12px;font-family:var(--mono)">${d}</div>`;
+  });
+  html+='</div><div style="display:flex;gap:3px;">';
+  weeks.forEach(w=>{
+    html+='<div style="display:flex;flex-direction:column;gap:3px;">';
+    for(let i=0;i<7;i++){
+      const cell=w[i];
+      if(cell){
+        const c=cell.count;
+        const cls=c===0?'hm-0':c===1?'hm-1':c===2?'hm-2':c===3?'hm-3':'hm-4';
+        html+=`<div class="hm-cell ${cls}" title="${cell.date}: ${c} session(s)" data-date="${cell.date}"></div>`;
+      }else{
+        html+='<div class="hm-cell" style="background:transparent"></div>';
+      }
+    }
+    html+='</div>';
+  });
+  html+='</div></div>';
+  cont.innerHTML=html;
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────
+function renderDashboard(){
+  const now=new Date();
+  const h=now.getHours();
+  document.getElementById('dash-greeting').textContent=(h<12?'Good morning':h<17?'Good afternoon':'Good evening')+' 👋';
+  document.getElementById('dash-date').textContent=now.toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // stats
+  const streak=calcStreak();
+  document.getElementById('stat-streak').textContent=streak;
+  document.getElementById('streak-big').textContent=streak;
+  document.getElementById('stat-courses').textContent=state.courses.length;
+  const done=state.courses.reduce((a,c)=>a+(c.topics||[]).filter(t=>t.status==='done').length,0);
+  document.getElementById('stat-done').textContent=done;
+  const upcomingEvt=getUpcomingEvents(7);
+  document.getElementById('stat-events').textContent=upcomingEvt.length;
+
+  renderHeatmap();
+  renderTodaySchedule();
+  renderDashCourses();
+  renderDashEvents();
+}
+
+function calcStreak(){
+  let streak=0;
+  const d=new Date();
+  while(true){
+    const key=d.toISOString().split('T')[0];
+    if(state.activity[key]){streak++;d.setDate(d.getDate()-1);}
+    else break;
+  }
+  return streak;
+}
+
+function getUpcomingEvents(days){
+  const today=new Date();today.setHours(0,0,0,0);
+  const future=new Date(today);future.setDate(future.getDate()+days);
+  return state.events.filter(e=>{const d=new Date(e.date);return d>=today&&d<=future;}).sort((a,b)=>new Date(a.date)-new Date(b.date));
+}
+
+function renderTodaySchedule(){
+  const day=new Date().getDay();
+  const dayIdx=day===0?6:day-1;
+  const slots=state.timetable.filter(s=>s.day===dayIdx).sort((a,b)=>a.time.localeCompare(b.time));
+  const cont=document.getElementById('today-schedule');
+  if(!slots.length){cont.innerHTML='<div style="color:var(--text3);font-size:13px;padding:0.75rem 0">No classes today.</div>';return;}
+  cont.innerHTML=slots.map(s=>{
+    const course=state.courses.find(c=>c.id===s.courseId);
+    const col=course?course.color:'#3d8ef8';
+    return `<div class="schedule-item">
+      <div class="schedule-time">${s.time}</div>
+      <div>
+        <div class="schedule-pill" style="background:${col}22;color:${col}">${course?course.name:'Unknown'}</div>
+        <div class="schedule-type">${s.type}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDashCourses(){
+  const cont=document.getElementById('dash-courses');
+  if(!state.courses.length){cont.innerHTML='<div style="color:var(--text3);font-size:12px;grid-column:1/-1">No courses yet.</div>';return;}
+  cont.innerHTML=state.courses.slice(0,4).map(c=>{
+    const tot=(c.topics||[]).length;
+    const dn=(c.topics||[]).filter(t=>t.status==='done').length;
+    const pct=tot?Math.round(dn/tot*100):0;
+    const r=16;const circ=2*Math.PI*r;const dash=circ*(1-pct/100);
+    return `<div class="course-mini" onclick="openCourseDetail('${c.id}');navigate('courses')">
+      <div class="ring-wrap">
+        <svg width="40" height="40" viewBox="0 0 40 40">
+          <circle cx="20" cy="20" r="${r}" fill="none" stroke="var(--bg4)" stroke-width="4"/>
+          <circle cx="20" cy="20" r="${r}" fill="none" stroke="${c.color}" stroke-width="4"
+            stroke-dasharray="${circ}" stroke-dashoffset="${dash}" stroke-linecap="round"/>
+        </svg>
+        <div class="ring-val" style="color:${c.color}">${pct}%</div>
+      </div>
+      <div>
+        <div class="course-mini-name">${c.name}</div>
+        <div class="course-mini-sub">${dn}/${tot} topics</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDashEvents(){
+  const cont=document.getElementById('dash-events');
+  const evts=getUpcomingEvents(30);
+  if(!evts.length){cont.innerHTML='<div style="color:var(--text3);font-size:13px;padding:0.5rem 0">No upcoming events.</div>';return;}
+  cont.innerHTML=evts.slice(0,5).map(e=>{
+    const d=new Date(e.date);
+    const label=d.toLocaleDateString('en-IN',{month:'short',day:'numeric'});
+    return `<div class="event-item">
+      <div class="event-dot" style="background:${EV_COLORS[e.type]||'#3d8ef8'}"></div>
+      <div style="flex:1">
+        <div class="event-name">${e.name}</div>
+        <div class="event-date">${label}</div>
+      </div>
+      <span class="event-badge" style="background:${EV_BG[e.type]};color:${EV_COLORS[e.type]}">${e.type}</span>
+    </div>`;
+  }).join('');
+}
+
+function logStudyDay(){
+  const key=new Date().toISOString().split('T')[0];
+  state.activity[key]=(state.activity[key]||0)+1;
+  saveState();renderDashboard();
+}
+
+// ── TIMETABLE ─────────────────────────────────────────────
+function renderTimetable(){
+  const cont=document.getElementById('tt-container');
+  let html='<div class="tt-grid">';
+  html+='<div class="tt-cell tt-header"></div>';
+  DAYS.forEach((d,i)=>{
+    const today=new Date();
+    const todayIdx=today.getDay()===0?6:today.getDay()-1;
+    html+=`<div class="tt-cell tt-header"><div class="tt-day-num" style="${i===todayIdx?'color:var(--accent)':''}">${d.slice(0,3)}</div><div style="font-size:10px;color:var(--text3)">${d}</div></div>`;
+  });
+  HOURS.forEach(h=>{
+    html+=`<div class="tt-cell tt-time">${h}</div>`;
+    DAYS.forEach((d,di)=>{
+      const slots=state.timetable.filter(s=>s.day===di&&s.time===h);
+      html+='<div class="tt-cell">';
+      slots.forEach(s=>{
+        const course=state.courses.find(c=>c.id===s.courseId);
+        const col=course?course.color:'#3d8ef8';
+        html+=`<div class="tt-slot" style="background:${col}22;color:${col};border-left:2px solid ${col}" onclick="removeSlot('${s.id}')">
+          <div class="tt-slot-name">${course?course.name:'?'}</div>
+          <div class="tt-slot-type">${s.type} · ×</div>
+        </div>`;
+      });
+      if(!slots.length)html+=`<div class="tt-add" onclick="openAddSlotAt(${di},'${h}')"><i class="ti ti-plus" style="font-size:14px" aria-hidden="true"></i></div>`;
+      html+='</div>';
+    });
+  });
+  html+='</div>';
+  cont.innerHTML=html;
+}
+
+function openAddSlot(){
+  populateSlotCourses();document.getElementById('modal-slot').classList.add('open');
+}
+function openAddSlotAt(day,time){
+  populateSlotCourses();
+  document.getElementById('slot-day').value=day;
+  document.getElementById('slot-time').value=time;
+  document.getElementById('modal-slot').classList.add('open');
+}
+function populateSlotCourses(){
+  const sel=document.getElementById('slot-course');
+  sel.innerHTML=state.courses.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  if(!state.courses.length)sel.innerHTML='<option>No courses yet</option>';
+}
+function saveSlot(){
+  if(!state.courses.length)return;
+  const slot={id:Date.now().toString(),courseId:document.getElementById('slot-course').value,
+    day:parseInt(document.getElementById('slot-day').value),
+    time:document.getElementById('slot-time').value,
+    type:document.getElementById('slot-type').value};
+  state.timetable.push(slot);saveState();closeModal('modal-slot');renderTimetable();
+}
+function removeSlot(id){
+  state.timetable=state.timetable.filter(s=>s.id!==id);
+  saveState();renderTimetable();
+}
+
+// ── COURSES ───────────────────────────────────────────────
+function renderCourses(){
+  const g=document.getElementById('courses-grid');
+  g.innerHTML=state.courses.map(c=>{
+    const tot=(c.topics||[]).length;
+    const dn=(c.topics||[]).filter(t=>t.status==='done').length;
+    const pct=tot?Math.round(dn/tot*100):0;
+    return `<div class="course-card" onclick="openCourseDetail('${c.id}')">
+      <div class="course-dot" style="background:${c.color}22;font-size:22px">${c.icon||'📚'}</div>
+      <div class="course-name">${c.name}</div>
+      <div class="course-desc">${c.desc||'No description'}</div>
+      <div class="prog-bar-wrap"><div class="prog-bar" style="width:${pct}%;background:${c.color}"></div></div>
+      <div class="prog-label"><span>${pct}% complete</span><span>${dn}/${tot} topics</span></div>
+    </div>`;
+  }).join('');
+  g.innerHTML+=`<div class="add-course-card" onclick="openAddCourse()"><i class="ti ti-plus" style="font-size:24px" aria-hidden="true"></i><span>New Course</span></div>`;
+}
+
+function openAddCourse(){
+  const picker=document.getElementById('course-color-picker');
+  picker.innerHTML=COLORS.map(col=>`<div class="color-swatch${col===selectedColor?' selected':''}" style="background:${col}" onclick="selectColor('${col}',this)"></div>`).join('');
+  openModal('modal-course');
+}
+function selectColor(col,el){
+  selectedColor=col;
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function saveCourse(){
+  const name=document.getElementById('course-name-input').value.trim();
+  if(!name)return;
+  const icons=['📚','💻','🔬','🧮','🌐','📝','🎯','🔭'];
+  const course={id:Date.now().toString(),name,desc:document.getElementById('course-desc-input').value,
+    targetDate:document.getElementById('course-date-input').value,color:selectedColor,
+    icon:icons[state.courses.length%icons.length],topics:[]};
+  state.courses.push(course);saveState();closeModal('modal-course');
+  document.getElementById('course-name-input').value='';
+  document.getElementById('course-desc-input').value='';
+  renderCourses();
+}
+
+function showCoursesList(){
+  document.getElementById('page-courses-list').style.display='';
+  document.getElementById('course-detail').classList.remove('active');
+  document.getElementById('course-detail').style.display='none';
+}
+function openCourseDetail(id){
+  state.activeCourse=id;
+  const c=state.courses.find(x=>x.id===id);if(!c)return;
+  document.getElementById('page-courses-list').style.display='none';
+  document.getElementById('course-detail').style.display='block';
+  document.getElementById('course-detail').classList.add('active');
+  document.getElementById('cd-title').textContent=c.name;
+  document.getElementById('cd-sub').textContent=c.desc||'';
+  renderTopics();
+}
+function closeCourseDetail(){showCoursesList();renderCourses();}
+
+function setTopicView(v){
+  state.topicView=v;
+  document.getElementById('vb-kanban').classList.toggle('active',v==='kanban');
+  document.getElementById('vb-checklist').classList.toggle('active',v==='checklist');
+  document.getElementById('topic-kanban').style.display=v==='kanban'?'':'none';
+  document.getElementById('topic-checklist').style.display=v==='checklist'?'':'none';
+}
+
+function renderTopics(){
+  const c=state.courses.find(x=>x.id===state.activeCourse);if(!c)return;
+  const topics=c.topics||[];
+  const cols={todo:'Not Started',inprogress:'In Progress',done:'Done'};
+  const colColors={todo:'var(--text3)',inprogress:'var(--amber)',done:'var(--green)'};
+  let khtml='<div class="kanban">';
+  Object.entries(cols).forEach(([k,label])=>{
+    const items=topics.filter(t=>t.status===k);
+    khtml+=`<div class="kanban-col">
+      <div class="kanban-col-head">
+        <div class="kanban-col-title" style="color:${colColors[k]}">${label}</div>
+        <div class="kanban-count">${items.length}</div>
+      </div>`;
+    items.forEach(t=>{
+      khtml+=`<div class="kanban-card" onclick="cycleTopicStatus('${t.id}')">
+        <div class="kc-title">${t.name}</div>
+        ${t.notes?`<div class="kc-sub">${t.notes}</div>`:''}
+        <span class="kc-tag" style="background:${EV_BG[k==='todo'?'reminder':k==='inprogress'?'deadline':'holiday']};color:${colColors[k]}">${label}</span>
+      </div>`;
+    });
+    khtml+='</div>';
+  });
+  khtml+='</div>';
+  document.getElementById('topic-kanban').innerHTML=khtml;
+
+  let chtml='<div class="checklist">';
+  const total=topics.length;const done=topics.filter(t=>t.status==='done').length;
+  chtml+=`<div style="margin-bottom:12px"><div class="prog-bar-wrap" style="height:6px"><div class="prog-bar" style="width:${total?Math.round(done/total*100):0}%;background:${c.color}"></div></div><div style="font-size:12px;color:var(--text2);margin-top:4px">${done}/${total} topics completed</div></div>`;
+  topics.forEach(t=>{
+    chtml+=`<div class="check-item${t.status==='done'?' done':''}" onclick="cycleTopicStatus('${t.id}')">
+      <div class="check-box">${t.status==='done'?'<i class="ti ti-check" style="font-size:12px;color:#fff" aria-hidden="true"></i>':''}</div>
+      <div class="check-label">${t.name}</div>
+      <div class="check-status">${t.notes||''}</div>
+    </div>`;
+  });
+  chtml+='</div>';
+  document.getElementById('topic-checklist').innerHTML=chtml;
+
+  setTopicView(state.topicView);
+}
+
+function cycleTopicStatus(id){
+  const c=state.courses.find(x=>x.id===state.activeCourse);if(!c)return;
+  const t=(c.topics||[]).find(x=>x.id===id);if(!t)return;
+  const order=['todo','inprogress','done'];
+  t.status=order[(order.indexOf(t.status)+1)%3];
+  if(t.status==='done'){
+    const key=new Date().toISOString().split('T')[0];
+    state.activity[key]=(state.activity[key]||0)+1;
+  }
+  saveState();renderTopics();
+}
+
+function openAddTopic(){openModal('modal-topic');}
+function saveTopic(){
+  const name=document.getElementById('topic-name-input').value.trim();if(!name)return;
+  const c=state.courses.find(x=>x.id===state.activeCourse);if(!c)return;
+  if(!c.topics)c.topics=[];
+  c.topics.push({id:Date.now().toString(),name,notes:document.getElementById('topic-notes-input').value,
+    status:document.getElementById('topic-status-input').value});
+  saveState();closeModal('modal-topic');
+  document.getElementById('topic-name-input').value='';
+  document.getElementById('topic-notes-input').value='';
+  renderTopics();
+}
+
+// ── CALENDAR ─────────────────────────────────────────────
+function renderCalendar(){
+  const mnames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent=`${mnames[state.calMonth]} ${state.calYear}`;
+  if(state.calView==='month')renderMonthCal();
+  else renderWeekCal();
+}
+function calNav(d){
+  if(state.calView==='month'){
+    state.calMonth+=d;
+    if(state.calMonth>11){state.calMonth=0;state.calYear++;}
+    if(state.calMonth<0){state.calMonth=11;state.calYear--;}
+  }else{
+    const dt=new Date(state.calYear,state.calMonth,state.calWeekStart||1);
+    dt.setDate(dt.getDate()+d*7);
+    state.calYear=dt.getFullYear();state.calMonth=dt.getMonth();state.calWeekStart=dt.getDate();
+  }
+  renderCalendar();
+}
+function calToday(){
+  const n=new Date();state.calYear=n.getFullYear();state.calMonth=n.getMonth();renderCalendar();
+}
+function setCalView(v){
+  state.calView=v;
+  document.getElementById('cvb-month').classList.toggle('active',v==='month');
+  document.getElementById('cvb-week').classList.toggle('active',v==='week');
+  renderCalendar();
+}
+
+function renderMonthCal(){
+  const cont=document.getElementById('cal-container');
+  const first=new Date(state.calYear,state.calMonth,1);
+  const last=new Date(state.calYear,state.calMonth+1,0);
+  let startDay=first.getDay()===0?6:first.getDay()-1;
+  const today=new Date();
+  let html='<div class="cal-grid">';
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d=>{html+=`<div class="cal-dh">${d}</div>`;});
+  for(let i=0;i<startDay;i++){
+    const d=new Date(first);d.setDate(d.getDate()-startDay+i);
+    html+=`<div class="cal-day other-month"><span class="cal-num">${d.getDate()}</span></div>`;
+  }
+  for(let d=1;d<=last.getDate();d++){
+    const isToday=today.getFullYear()===state.calYear&&today.getMonth()===state.calMonth&&today.getDate()===d;
+    const dateStr=`${state.calYear}-${String(state.calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evts=state.events.filter(e=>e.date===dateStr);
+    html+=`<div class="cal-day${isToday?' today':''}" onclick="openAddEventOn('${dateStr}')">
+      <span class="cal-num">${d}</span>
+      ${evts.map(e=>`<div class="cal-ev" style="background:${EV_BG[e.type]};color:${EV_COLORS[e.type]}">${e.name}</div>`).join('')}
+    </div>`;
+  }
+  const rem=(7-((startDay+last.getDate())%7))%7;
+  for(let i=1;i<=rem;i++){html+=`<div class="cal-day other-month"><span class="cal-num">${i}</span></div>`;}
+  html+='</div>';
+  cont.innerHTML=html;
+}
+
+function renderWeekCal(){
+  const cont=document.getElementById('cal-container');
+  const today=new Date();
+  const base=new Date(state.calYear,state.calMonth,state.calWeekStart||today.getDate());
+  const mon=new Date(base);const dow=mon.getDay()===0?6:mon.getDay()-1;
+  mon.setDate(mon.getDate()-dow);
+  let html='<div class="week-grid">';
+  html+='<div class="week-header" style="background:var(--bg3)"></div>';
+  for(let i=0;i<7;i++){
+    const d=new Date(mon);d.setDate(d.getDate()+i);
+    const isT=d.toDateString()===today.toDateString();
+    html+=`<div class="week-header"><div class="week-day" style="${isT?'color:var(--accent)':''}">${DAYS[i].slice(0,3)}</div><div class="week-date" style="${isT?'color:var(--accent)':''}">${d.getDate()}</div></div>`;
+  }
+  HOURS.forEach(h=>{
+    html+=`<div class="week-time-cell">${h}</div>`;
+    for(let i=0;i<7;i++){
+      const d=new Date(mon);d.setDate(d.getDate()+i);
+      const dateStr=d.toISOString().split('T')[0];
+      const evts=state.events.filter(e=>e.date===dateStr);
+      const slots=state.timetable.filter(s=>s.day===i&&s.time===h);
+      html+='<div class="week-cell">';
+      slots.forEach(s=>{
+        const c=state.courses.find(x=>x.id===s.courseId);
+        const col=c?c.color:'#3d8ef8';
+        html+=`<div class="week-event" style="background:${col}22;color:${col}">${c?c.name:'?'}</div>`;
+      });
+      if(h==='08:00')evts.forEach(e=>{html+=`<div class="week-event" style="background:${EV_BG[e.type]};color:${EV_COLORS[e.type]}">${e.name}</div>`;});
+      html+='</div>';
+    }
+  });
+  html+='</div>';
+  cont.innerHTML=html;
+}
+
+function openAddEvent(){
+  const sel=document.getElementById('event-course-input');
+  sel.innerHTML='<option value="">None</option>'+state.courses.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const d=new Date();document.getElementById('event-date-input').value=d.toISOString().split('T')[0];
+  openModal('modal-event');
+}
+function openAddEventOn(date){
+  const sel=document.getElementById('event-course-input');
+  sel.innerHTML='<option value="">None</option>'+state.courses.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  document.getElementById('event-date-input').value=date;
+  openModal('modal-event');
+}
+function saveEvent(){
+  const name=document.getElementById('event-name-input').value.trim();if(!name)return;
+  const evt={id:Date.now().toString(),name,date:document.getElementById('event-date-input').value,
+    type:document.getElementById('event-type-input').value,
+    courseId:document.getElementById('event-course-input').value};
+  state.events.push(evt);saveState();closeModal('modal-event');
+  document.getElementById('event-name-input').value='';
+  renderCalendar();
+}
+
+// ── INIT ─────────────────────────────────────────────────
+async function init(){
+  await loadState();
+  if(state.settings.theme==='light'){
+    document.body.classList.add('light');
+    document.getElementById('theme-icon').className='ti ti-moon';
+    document.getElementById('theme-label').textContent='Dark Mode';
+  }
+  renderDashboard();
+}
+init();
+</script>
+</body>
+</html>
